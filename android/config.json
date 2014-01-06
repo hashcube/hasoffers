@@ -1,0 +1,12 @@
+{
+    "copyFiles": [
+        "HasoffersPlugin.java"
+    ],
+    "libraries": [
+    ],
+    "jars": [
+        "MobileAppTracker.jar"
+    ],
+    "injectionXML": "manifest.xml",
+	"injectionXSL": "manifest.xsl"
+}
