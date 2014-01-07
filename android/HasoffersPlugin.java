@@ -103,7 +103,7 @@ public class HasoffersPlugin implements IPlugin {
             price = obj.getDouble("price");
             purchaseData = obj.getString("purchaseData");
             dataSignature = obj.getString("dataSignature");
-            _mobileapptracker.trackAction("purchase", price, "USD", purchaseData, dataSignature, "garbage");
+            _mobileapptracker.trackAction("purchase", price, "USD", "" ,purchaseData, dataSignature);
         } catch (JSONException e) {
             logger.log("{hasoffers} Purchase Validation - failure: " + e.getMessage());
         }
