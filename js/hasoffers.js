@@ -17,10 +17,11 @@ var Hasoffers = Class(function () {
 		pluginSend("trackInstall", params);
 	}
 
-	this.trackPurchase = function(price, purchaseData, dataSignature){
+	this.trackPurchase = function(price, purchaseData, dataSignature, token){
 		var params = {"price": price,
 					  "purchaseData": purchaseData,
-					  "dataSignature": dataSignature}
+					  "dataSignature": dataSignature,
+					  "token": token};
 
 		pluginSend("trackPurchase", params);
 	}

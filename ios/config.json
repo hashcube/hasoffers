@@ -1,12 +1,21 @@
 {
-    "copyFiles": [
-        "HasoffersPlugin.java"
-    ],
-    "libraries": [
-    ],
-    "jars": [
-        "MobileAppTracker.jar"
-    ],
-    "injectionXML": "manifest.xml",
-	"injectionXSL": "manifest.xsl"
+	"code": [
+		"HasoffersPlugin.h",
+		"HasoffersPlugin.mm"
+	],
+	"frameworks": [
+		"MobileAppTracker.framework",
+		"AdSupport",
+		"CoreTelephony",
+		"SystemConfiguration",
+		"MobileCoreServices"
+	],
+	"userDefined": [
+		"hasoffersadvid",
+		"hasofferskey"
+	],
+	"plist": {
+		"MAT_ADVERTISER_ID": "$(hasoffersadvid)",
+		"MAT_CONVERSION_KEY": "$(hasofferskey)"
+	}
 }
