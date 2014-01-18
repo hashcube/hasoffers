@@ -60,6 +60,13 @@
 }
 */
 
+- (void) setUID:(NSDictionary *)jsonObject {
+	if([jsonObject objectForKey:@"uid"]) {
+		NSString *uid = [NSString stringWithFormat:@"%@",[jsonObject valueForKey:@"uid"]];
+		[[MobileAppTracker sharedManager] setUserId:uid];
+	}
+}
+
 - (void) trackInstall:(NSDictionary *)jsonObject {
 	if([jsonObject objectForKey:@"userType"]) {
 		NSString *userType = [NSString stringWithFormat:@"%@",[jsonObject valueForKey:@"userType"]];

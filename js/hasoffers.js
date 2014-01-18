@@ -29,6 +29,12 @@ var Hasoffers = Class(function () {
 	this.trackOpen = function() {
 		pluginSend("trackOpen");
 	}
+
+	this.setUID = function(uid) {
+		var params = {"uid": uid};
+
+		pluginSend("setUID", params);
+	}
 });
 
 exports = new Hasoffers();

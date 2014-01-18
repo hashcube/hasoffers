@@ -78,6 +78,17 @@ public class HasoffersPlugin implements IPlugin {
     public void onStart() {
     }
 
+    public void setUID(String json) {
+        String uid="";
+        try {
+            JSONObject obj = new JSONObject(json);
+            uid = obj.getString("uid");
+            _mobileAppTracker.setUserId(uid);
+        } catch (JSONException e) {
+            logger.log("{hasoffers} setUID - failure: " + e.getMessage());
+        }
+    }
+
     public void trackInstall(String json) {
         //Next we parse the json parameter
         String userType = "unknown";
@@ -90,7 +101,7 @@ public class HasoffersPlugin implements IPlugin {
                 _mobileapptracker.trackInstall();
             }
         } catch (JSONException e) {
-            logger.log("{hasoffers} Init - failure: " + e.getMessage());
+            logger.log("{hasoffers} Install - failure: " + e.getMessage());
         }
     }
 
