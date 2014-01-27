@@ -83,7 +83,7 @@ public class HasoffersPlugin implements IPlugin {
         try {
             JSONObject obj = new JSONObject(json);
             uid = obj.getString("uid");
-            _mobileAppTracker.setUserId(uid);
+            _mobileapptracker.setUserId(uid);
         } catch (JSONException e) {
             logger.log("{hasoffers} setUID - failure: " + e.getMessage());
         }
