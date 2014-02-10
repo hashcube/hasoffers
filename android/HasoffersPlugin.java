@@ -60,8 +60,8 @@ public class HasoffersPlugin implements IPlugin {
         //**********************************
         //**********************************
         //**********************************
-        _mobileapptracker.setAllowDuplicates(true);
-        _mobileapptracker.setDebugMode(true);
+        //_mobileapptracker.setAllowDuplicates(true);
+        //_mobileapptracker.setDebugMode(true);
         //**********************************
         //**********************************
         //*********REMEMBER TO DELETE*******
