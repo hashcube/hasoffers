@@ -22,13 +22,15 @@ import android.os.Bundle;
 public class HasoffersPlugin implements IPlugin {
     Activity activity;
     MobileAppTracker _mobileapptracker;
+    Context _ctx;
+    Intent _intent;
 
     public HasoffersPlugin() {
 
     }
 
     public void onCreateApplication(Context applicationContext) {
-
+        this._ctx = applicationContext;
     }
 
     public void onCreate(Activity activity, Bundle savedInstanceState) {
@@ -49,7 +51,7 @@ public class HasoffersPlugin implements IPlugin {
         //Init MAT Tracker
         _mobileapptracker = new MobileAppTracker(
                 this.activity,
-                hasoffersAdvId, 
+                hasoffersAdvId,
                 hasoffersKey);
         //Disallow these in production build
         //**********************************
@@ -135,11 +137,12 @@ public class HasoffersPlugin implements IPlugin {
     }
 
     public void onNewIntent(Intent intent) {
-
+        this._intent = intent;
     }
 
     public void setInstallReferrer(String referrer) {
-
+        Tracker tracker = new Tracker();
+        tracker.onReceive(this._ctx, this._intent);
     }
 
     public void onActivityResult(Integer request, Integer result, Intent data) {
