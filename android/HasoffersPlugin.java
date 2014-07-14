@@ -140,9 +140,9 @@ public class HasoffersPlugin implements IPlugin {
         this._intent = intent;
     }
 
-    public void setInstallReferrer(String referrer) {
-        Tracker tracker = new Tracker();
-        tracker.onReceive(this._ctx, this._intent);
+    public void setInstallReferrer(Context context, Intent intent) {
+	Tracker tracker = new Tracker();
+	tracker.onReceive(context, intent);
     }
 
     public void onActivityResult(Integer request, Integer result, Intent data) {
