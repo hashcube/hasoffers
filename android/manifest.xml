@@ -5,4 +5,9 @@
 <!--START_PLUGINS_APPLICATION-->
 	<meta-data android:name="HASOFFERS_KEY" android:value=""/>
 	<meta-data android:name="HASOFFERS_ADV_ID" android:value=""/>
+	<receiver android:name="com.mobileapptracker.Tracker" android:exported="true">
+	  <intent-filter>
+	      <action android:name="com.android.vending.INSTALL_REFERRER" />
+	  </intent-filter>
+	</receiver>
 <!--END_PLUGINS_APPLICATION-->
