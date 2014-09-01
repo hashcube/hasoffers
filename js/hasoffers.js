@@ -22,11 +22,11 @@ var Hasoffers = Class(function () {
 		pluginSend("setUserIds", params);
 	}
 
-	this.trackPurchase = function(recieptId, sku, name, price, quantity, currency){
+	this.trackPurchase = function(receipt, sku, name, price, quantity, currency){
 		quantity = quantity || 1;
 
 		var params = {
-			recieptId: recieptId,
+			receipt: receipt,
 			sku: sku,
 			name: name,
 			quantity: quantity,
