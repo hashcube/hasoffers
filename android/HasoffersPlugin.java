@@ -143,7 +143,7 @@ public class HasoffersPlugin implements IPlugin {
   public void trackPurchase(String json) {
     try {
       JSONObject data = new JSONObject(json);
-      String recieptId = data.getString("recieptId");
+      String receiptId = data.getString("receipt");
       String sku = data.getString("sku");
       String name = data.getString("name");
       int quantity = data.getInt("quantity");
@@ -152,8 +152,8 @@ public class HasoffersPlugin implements IPlugin {
       List<MATEventItem> events = new ArrayList();
       events.add(new MATEventItem(name, quantity, unitPrice, revenue));
       String currency = data.getString("currency");
-      _mobileapptracker.measureAction("purchase", events, revenue, currency, recieptId);
-      logger.log(TAG, "Sent payment events", recieptId, sku, name, quantity, revenue, unitPrice);
+      _mobileapptracker.measureAction("purchase", events, revenue, currency, receiptId);
+      logger.log(TAG, "Sent payment events", receiptId, sku, name, quantity, revenue, unitPrice);
     } catch (JSONException ex) {
       ex.printStackTrace();
     }
