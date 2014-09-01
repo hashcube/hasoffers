@@ -36,7 +36,6 @@ public class HasoffersPlugin implements IPlugin {
   private final String TAG = "{{HasOffers}}";
 
   public HasoffersPlugin() {
-
   }
 
   public void onCreateApplication(Context applicationContext) {
@@ -102,7 +101,7 @@ public class HasoffersPlugin implements IPlugin {
 
   public void onStart() {
   }
-  // TODO: Error Handling code
+    // TODO: Error Handling code
   public void setUserIds(String json) {
     try {
       JSONObject data = new JSONObject();
