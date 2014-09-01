@@ -5,7 +5,7 @@
     "libraries": [
     ],
     "jars": [
-        "MobileAppTracker-3.3.3.jar"
+        "MobileAppTracker.jar"
     ],
     "injectionXML": "manifest.xml",
 	"injectionXSL": "manifest.xsl"
