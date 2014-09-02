@@ -1,6 +1,15 @@
 package com.tealeaf.plugin.plugins;
 
-import com.mobileapptracker.*;
+import com.mobileapptracker.MobileAppTracker;
+import com.mobileapptracker.MATEventItem;
+
+// Play Services
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import java.io.IOException;
+import android.provider.Settings.Secure;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -8,7 +17,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import com.tealeaf.logger;
 import com.tealeaf.TeaLeaf;
 import com.tealeaf.plugin.IPlugin;
-import java.io.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,140 +24,167 @@ import com.tealeaf.util.HTTP;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
-import android.util.Log;
 import android.os.Bundle;
+import java.util.List;
+import java.util.ArrayList;
 
 public class HasoffersPlugin implements IPlugin {
-    Activity activity;
-    MobileAppTracker _mobileapptracker;
+  Activity activity;
+  MobileAppTracker _mobileapptracker;
+  Context  ctx;
+  String userId = null, fb_id = null, google_id = null, twitter_id = null;
+  private final String TAG = "{{HasOffers}}";
 
-    public HasoffersPlugin() {
+  public HasoffersPlugin() {
+  }
 
+  public void onCreateApplication(Context applicationContext) {
+    ctx = applicationContext;
+  }
+
+  public void onCreate(Activity passedActivity, Bundle savedInstanceState) {
+    activity = passedActivity;
+    //Below segment gets the hasoffers key
+    PackageManager manager = activity.getPackageManager();
+    String hasoffersKey = "";
+    String hasoffersAdvId = "";
+    try {
+      Bundle meta = manager.getApplicationInfo(this.activity.getPackageName(), PackageManager.GET_META_DATA).metaData;
+      if (meta != null) {
+        hasoffersKey = meta.getString("HASOFFERS_KEY");
+        hasoffersAdvId = meta.getString("HASOFFERS_ADV_ID");
+      }
+    } catch (Exception e) {
+      android.util.Log.d("EXCEPTION", "" + e.getMessage());
     }
+    //Init MAT Tracker
+    MobileAppTracker.init(
+      this.ctx,
+      hasoffersAdvId,
+      hasoffersKey);
 
-    public void onCreateApplication(Context applicationContext) {
+    _mobileapptracker = MobileAppTracker.getInstance();
 
-    }
-
-    public void onCreate(Activity activity, Bundle savedInstanceState) {
-        this.activity = activity;
-        //Below segment gets the hasoffers key
-        PackageManager manager = this.activity.getPackageManager();
-        String hasoffersKey = "";
-        String hasoffersAdvId = "";
+    new Thread(new Runnable() {
+      @Override public void run() {
+        // See sample code at http://developer.android.com/google/play-services/id.html
         try {
-            Bundle meta = manager.getApplicationInfo(this.activity.getPackageName(), PackageManager.GET_META_DATA).metaData;
-            if (meta != null) {
-                hasoffersKey = meta.getString("HASOFFERS_KEY");
-                hasoffersAdvId = meta.getString("HASOFFERS_ADV_ID");
-            }
-        } catch (Exception e) {
-            android.util.Log.d("EXCEPTION", "" + e.getMessage());
+          Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(ctx);
+          _mobileapptracker.setGoogleAdvertisingId(adInfo.getId(), adInfo.isLimitAdTrackingEnabled());
+        } catch (IOException e) {
+          // Unrecoverable error connecting to Google Play services (e.g.,
+          // the old version of the service doesn't support getting AdvertisingId).
+          _mobileapptracker.setAndroidId(Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID));
+        } catch (GooglePlayServicesNotAvailableException e) {
+          // Google Play services is not available entirely.
+          _mobileapptracker.setAndroidId(Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID));
+        } catch (GooglePlayServicesRepairableException e) {
+          // Encountered a recoverable error connecting to Google Play services.
+          _mobileapptracker.setAndroidId(Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID));
+        } catch (NullPointerException e) {
+          // getId() is sometimes null
+          _mobileapptracker.setAndroidId(Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID));
         }
-        //Init MAT Tracker
-        _mobileapptracker = new MobileAppTracker(
-                this.activity,
-                hasoffersAdvId, 
-                hasoffersKey);
-        //Disallow these in production build
-        //**********************************
-        //**********************************
-        //**********************************
-        //**********************************
-        //*********REMEMBER TO DELETE*******
-        //**********************************
-        //**********************************
-        //**********************************
-        //_mobileapptracker.setAllowDuplicates(true);
-        //_mobileapptracker.setDebugMode(true);
-        //**********************************
-        //**********************************
-        //*********REMEMBER TO DELETE*******
-        //**********************************
-        //**********************************
-        //**********************************
-        //**********************************
+      }
+    }).start();
+
+    //Disallow these in production build
+    //_mobileapptracker.setAllowDuplicates(true);
+    //_mobileapptracker.setDebugMode(true);
+  }
+
+  public void onResume() {
+    logger.log(TAG, "Measuring session now");
+    _mobileapptracker.setReferralSources(activity);
+    _mobileapptracker.measureSession();
+  }
+
+  public void onStart() {
+  }
+    // TODO: Error Handling code
+  public void setUserIds(String json) {
+    try {
+      JSONObject data = new JSONObject();
+      if (data.has("uid")) {
+        _mobileapptracker.setUserId(data.getString("uid"));
+      }
+      if (data.has("fb_id")) {
+        _mobileapptracker.setFacebookUserId(data.getString("fb_id"));
+      }
+      if (data.has("google_id")) {
+        _mobileapptracker.setGoogleUserId(data.getString("google_id"));
+      }
+      if (data.has("twitter_id")) {
+        _mobileapptracker.setTwitterUserId(data.getString("twitter_id"));
+      }
+    } catch (JSONException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public void trackLevel (String json) {
+    try {
+      JSONObject data = new JSONObject(json);
+      if (data.has("level")) {
+        _mobileapptracker.setEventLevel(data.getInt("level"));
+      } else {
+        throw new Exception("No Level data found while setting a level");
+      }
+      if (data.has("attr")) {
+        _mobileapptracker.setEventAttribute1(data.getString("attr"));
+      }
+      _mobileapptracker.measureAction("level_achieved");
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
-    public void onResume() {
+  }
 
+  public void trackPurchase(String json) {
+    try {
+      JSONObject data = new JSONObject(json);
+      String receiptId = data.getString("receipt");
+      String sku = data.getString("sku");
+      String name = data.getString("name");
+      int quantity = data.getInt("quantity");
+      double revenue = data.getDouble("revenue");
+      double unitPrice = data.getDouble("unitPrice");
+      List<MATEventItem> events = new ArrayList();
+      events.add(new MATEventItem(name, quantity, unitPrice, revenue));
+      String currency = data.getString("currency");
+      _mobileapptracker.measureAction("purchase", events, revenue, currency, receiptId);
+      logger.log(TAG, "Sent payment events", receiptId, sku, name, quantity, revenue, unitPrice);
+    } catch (JSONException ex) {
+      ex.printStackTrace();
     }
+  }
 
-    public void onStart() {
-    }
+  public void onPause() {
 
-    public void setUID(String json) {
-        String uid="";
-        try {
-            JSONObject obj = new JSONObject(json);
-            uid = obj.getString("uid");
-            _mobileapptracker.setUserId(uid);
-        } catch (JSONException e) {
-            logger.log("{hasoffers} setUID - failure: " + e.getMessage());
-        }
-    }
+  }
 
-    public void trackInstall(String json) {
-        //Next we parse the json parameter
-        String userType = "unknown";
-        try {
-            JSONObject obj = new JSONObject(json);
-            userType = obj.getString("userType");
-            if(userType == "old") {
-                _mobileapptracker.trackUpdate();
-            } else {
-                _mobileapptracker.trackInstall();
-            }
-        } catch (JSONException e) {
-            logger.log("{hasoffers} Install - failure: " + e.getMessage());
-        }
-    }
+  public void onStop() {
+  }
 
-    public void trackPurchase(String json) {
-        Double price = 0.00;
-        String purchaseData = "";
-        String dataSignature = "";
-        try {
-            JSONObject obj = new JSONObject(json);
-            price = obj.getDouble("price");
-            purchaseData = obj.getString("purchaseData");
-            dataSignature = obj.getString("dataSignature");
-            _mobileapptracker.trackAction("purchase", price, "USD", "" ,purchaseData, dataSignature);
-        } catch (JSONException e) {
-            logger.log("{hasoffers} Purchase Validation - failure: " + e.getMessage());
-        }
-    }
+  public void onDestroy() {
+  }
 
-    public void trackOpen(String dummy) {
-        _mobileapptracker.trackAction("open");
-    }
+  public void onNewIntent(Intent intent) {
 
-    public void onPause() {
+  }
 
-    }
+  public void setInstallReferrer(String referrer) {
 
-    public void onStop() {
-    }
+  }
 
-    public void onDestroy() {
-    }
+  public void onActivityResult(Integer request, Integer result, Intent data) {
 
-    public void onNewIntent(Intent intent) {
+  }
 
-    }
+  public boolean consumeOnBackPressed() {
+    return true;
+  }
 
-    public void setInstallReferrer(String referrer) {
-
-    }
-
-    public void onActivityResult(Integer request, Integer result, Intent data) {
-
-    }
-
-    public boolean consumeOnBackPressed() {
-        return true;
-    }
-
-    public void onBackPressed() {
-    }
+  public void onBackPressed() {
+  }
 }
