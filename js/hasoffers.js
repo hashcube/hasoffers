@@ -21,17 +21,17 @@ var Hasoffers = Class(function () {
     pluginSend("setUserIds", params);
   }
 
-  this.trackPurchase = function(receipt, sku, name, price, quantity, currency){
+  this.trackPurchase = function(receipt, sku, price, quantity, currency, token) {
     quantity = quantity || 1;
 
     var params = {
       receipt: receipt,
       sku: sku,
-      name: name,
       quantity: quantity,
       unitPrice: price,
       revenue: quantity * price,
-      currency: currency || 'USD'
+      currency: currency || 'USD',
+      token: token
     }
 
     pluginSend("trackPurchase", params);
