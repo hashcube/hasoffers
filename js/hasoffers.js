@@ -3,9 +3,8 @@
  */
 
 function pluginSend(evt, params) {
-  NATIVE && NATIVE.plugins && NATIVE.plugins.sendEvent &&
-    NATIVE.plugins.sendEvent("HasoffersPlugin", evt,
-        JSON.stringify(params || {}));
+  NATIVE.plugins.sendEvent("HasoffersPlugin", evt,
+    JSON.stringify(params || {}));
 }
 
 var Hasoffers = Class(function () {
